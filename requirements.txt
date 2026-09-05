@@ -1,0 +1,9 @@
+# The scientific versions match the reviewed MRI artifact-correction report.
+mne @ https://github.com/mne-tools/mne-python/archive/64473254ed0c2c64627a5864a666686a43ef8be8.zip
+numpy==2.2.3
+scipy==1.18.1
+matplotlib==3.10.1
+threadpoolctl==3.5.0
+PyQt6>=6.4
+pyqtgraph==0.14.0
+pyxdf>=1.16

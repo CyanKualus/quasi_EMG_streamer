@@ -1,0 +1,31 @@
+# Local Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Generated analysis results, screenshots, and source recordings
+output/
+*.eeg
+*.vhdr
+*.vmrk
+*.xdf
+*.fif
+*.fif.gz
+*.npy
+*.npz
+
+# Local secrets and operating-system files
+.env
+.env.*
+!.env.example
+Thumbs.db
+.DS_Store
