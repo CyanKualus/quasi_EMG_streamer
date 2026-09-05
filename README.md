@@ -29,7 +29,7 @@ Selecting Online Monitoring opens the window full screen. Press Esc or switch
 tabs to restore the previous window size.
 
 See [the connection and monitoring guide](docs/online_monitoring.md) for
-Recorder setup, timing assumptions, stream interruption behavior and validation.
+Recorder setup, timing assumptions and stream interruption behavior.
 
 ## Open and process a file
 
@@ -71,8 +71,7 @@ Marker times are sample locked; there is no XDF marker-time shift. The recording
 must contain the scheduled events through their ends. XDF retains the original
 embedded-trial marker and automatic clock-lag handling.
 
-The MNE option follows the full pipeline selected by the user from
-`EEG_EMG_MNE_vs_BrainVision_results.md`:
+The offline MNE correction pipeline:
 
 - Correct each EMG monopole and ECG at the native sample rate. Use a stable
   **2.5 s** computational cycle grid starting at sample zero, four preceding
@@ -91,12 +90,12 @@ The MNE option follows the full pipeline selected by the user from
 
 MRI correction uses pinned MNE **1.13.0.dev334+g64473254e**, commit
 `64473254ed0c2c64627a5864a666686a43ef8be8`, and the scientific package versions
-used in the report. Other MNE versions are rejected for correction. Advanced
+listed in `requirements.txt`. Other MNE versions are rejected for correction. Advanced
 parameters, including ECG channel and scanner TR, live in
 `quasi_emg_settings.json`. GUI preferences use a separate application profile.
 
-The report identified inverse burst copies at neighboring scanner cycles and
-mixed effects of cardiac correction on EMG. This remains an experimental
+Correction can introduce inverse burst copies at neighboring scanner cycles
+and alter EMG through cardiac correction. This remains an experimental
 correction, and the resulting bandwidth is limited to 100 Hz. The periodic grid
 assumes a stable scanner cycle; it does not recover physical scanner triggers.
 An incomplete final cycle is not corrected. The incomplete tail and first/last
@@ -136,35 +135,4 @@ The GUI can also open and process a supplied file:
 & .\.venv\Scripts\python.exe app.py "D:\recordings\raw.vhdr" --video 3 --mne-mri --process
 ```
 
-## Verification
-
-```powershell
-& .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-& .\.venv\Scripts\python.exe -m pytest -q
-```
-
-The tests cover the retained EMG detector, voltage scaling, single-file input,
-video lookup, the correction switch, periodic artifact subtraction, file
-readiness, isolated outputs and the desktop controls. Reviewed-recording
-checks and numerical comparisons are recorded in `docs/verification.md`.
-
 Original EMG algorithm and interface copied from NeuroCasting_QuasifMRI.
-MRI settings are from the 5 September 2026 in1948 report, preserved in
-`docs/EEG_EMG_MNE_vs_BrainVision_results.md` for provenance.
-
-## Online artifact-cleaning comparison
-
-The three reviewed recordings were replayed using MNE `GradientRemover` and
-5–60-second downstream buffers. Gradient correction can reproduce the offline
-step exactly with delayed symmetric templates, and past-only templates preserve
-the AAS EMG envelope closely. Windowed cardiac PCA-OBS differs substantially
-from the full-recording result. See [the comparison report](docs/online_mne_comparison.md)
-for measurements, figures, delays, a reproduced MNE boundary error and commands
-to repeat the experiment. This adds diagnostics; the application's processing
-and GUI behavior are unchanged.
-
-A follow-up [comparison with cardiac OBS omitted](docs/no_cardiac_comparison.md)
-tests all three recordings with no ECG dependency in the replay, including
-movement contrast, independent heartbeat timing, short buffers and known EMG
-burst probes. For the tested envelope display, the results support keeping AAS
-and making cardiac OBS optional.

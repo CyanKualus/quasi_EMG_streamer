@@ -131,8 +131,8 @@ period. Changing Cycle/TR changes template duration, buffering and latency;
 only the **2.5-second grid** has been evaluated against these recordings. The
 app does not infer scanner cycles, adjust clock drift or repair irregular
 trigger timing. Restart monitoring and rebuild the template after changing
-the scanner sequence. The prior burst-copy and residual-artifact limitations
-still apply; see [the no-cardiac comparison](no_cardiac_comparison.md).
+the scanner sequence. Correction can leave residual artifacts and introduce
+small burst copies at neighboring scanner cycles.
 
 ## Processing and interruptions
 
@@ -167,47 +167,6 @@ ten seconds without samples/complete messages stops the connection.
 
 This tab monitors only; it does not write a second recording or trial scores.
 
-## Validation
-
-`tests/test_online_monitor.py` exercises RDA calibration in both formats,
-fragmented packets, malformed input, block continuity, warm-up, marker gating,
-Recorder restart, disconnect, display freeze, bounded buffers and numerical
-agreement with the earlier replay at all four buffer lengths. Cardiac APIs are
-patched to fail if the online pipeline calls them.
-
-The display regressions also verify that plotted samples come from TKEO,
-LEFT/RIGHT limits, magnitudes, time windows, thresholds and freeze operate
-independently, and individual settings persist while older shared preferences
-are migrated. They also check immediate scaling without timer ticks or incoming
-samples, rescaling frozen data, and folding the stream panel while connection
-controls stay visible below the left-side options.
-
-`diagnostics/check_online_monitor.py` checks all three original 5000-Hz
-recordings against the saved no-cardiac experiment, then sends 90 seconds of
-recorded data through an actual local TCP RDA server into the new desktop tab.
-The source recordings are read only. The capture uses F1/F2 in opposite
-polarities for LEFT/RIGHT to exercise both displays; they are the same source
-pair, not independent hand recordings.
-
-The validation on 5 September 2026 produced **126 chunks per recording**, with
-the first output at **30 seconds**. Conditioned waveforms, causal EMG and TKEO
-envelopes matched the earlier pipeline exactly for all three files. The final
-run's median processing time was **19 ms per update**, with a **20–24 ms**
-95th percentile (rounded to milliseconds). The float32 TCP replay also matched its stored reference.
-These processing timings come from accelerated replay on this computer.
-
-Numerical results and the review capture are in
-`output/online_monitor_validation/results.json` and `online_monitor.png`.
-**An actual BrainAmp MR / BrainVision Recorder connection has not been tested
-here.** The local TCP replay validates the client and pipeline, not the
-acquisition computer's RDA settings or physical hardware connection.
-
-The complete regression suite passed: **80 tests**. `pip check` also reported
-existing environment conflicts between numba/numpy and pyinstaller/pefile;
-those packages were not changed for this feature. The tested scientific
-versions and the pyqtgraph dependency are specified in `requirements.txt`.
-
-```powershell
-& .\.venv\Scripts\python.exe -m pytest -q
-& .\.venv\Scripts\python.exe diagnostics/check_online_monitor.py
-```
+The client and processing pipeline have been checked using local TCP replay.
+An actual BrainAmp MR / BrainVision Recorder connection has not been tested
+here; verify the acquisition computer's RDA settings and hardware connection.
